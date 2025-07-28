@@ -12,22 +12,17 @@ class UserInfo:
         self.numToOpen = numToOpen # How many packs to simulate opening (only whole numbers)
         self.totalUnitCost = unitCost * numToOpen # Total cost of products
 
+# MTGOpenedPacks holds a list of MTGPack objects
+class MTGOpenedPacks:
+    def __init__(self, fPrice):
+        self.packList = [] # create an empty list
+        self.floorPrice = fPrice # Cheapest card that can be sold
+
 # MTGPack holds the info for each pack that was opened and calculates grossProfits for each pack, if any
 class MTGPack:
-    def __init__(self, fPrice):
+    def __init__(self):
         self.cardList = [] # List holding each card drawn for the pack
         self.packGrossProfit = 0.00
-        self.floorPrice = fPrice
-
-    # addCard adds the currently draw card to the card list
-    def addCard(self, card):
-        self.cardList.append(card)
-
-    # totalGrossProfit calculates total gross profits of all openings
-    def totalGrossProfit(self):
-        for card in self.cardList: # For-in loop
-            if card.cardPrice >= self.floorPrice: # if the current card's market price >= user inputted floor price
-                self.packGrossProfit += card.cardPrice # add the current card's market price to the pack's gross profit
 
 # MTGCard holds the information for a single card that was found within a pack
 class MTGCard:
@@ -42,31 +37,62 @@ def getInfo():
     setType = input("Set Type: ")
     unitCost = float(input("Unit Cost: "))
     floorPrice = float(input("Floor Price: "))
-    numToOpen = int(input("Number of openings: "))
+    numToOpen = int(input("Number of packs to open: "))
 
     # Obj holding the user's choices / information
     userInput = UserInfo(setName, setType, unitCost, floorPrice, numToOpen)
 
     return userInput
 
-# Obj to hold the user inputted information
+# genMTGPack generates a MTGPack
+def genMTGPack():
+    pass
+
+# genRandCard generates a random card, used for testing. numOfCard == Num of cards per pack, currentPack == MTGPack obj
+# returns a list of cards that were drawn
+def genRandCard(numOfCard):
+    # Placeholder names for cards
+    namePlaceHolder = ["Goblin", "Shark", "Cat", "Dog", "Vampire", "Angel", "Demon", "Ent", "Elf", "Orc", "Dwarf", "Fireball", "Lightning", "Curse", "Pacify"]
+    # Placeholder rarities
+    rarityPlaceHolder = ["Mythic", "Rare", "Uncommon", "Common"]
+
+    cardList = [] # list of MTGCard objects
+
+    for _ in range(numOfCard):
+        cardName = random.choice(namePlaceHolder) # get random name for card
+        cardRarity = random.choice(rarityPlaceHolder) # randomly selected rarity
+        cardPrice = round(random.uniform(0.01, 0.5), 2) # random price from 0.01 to 20.00 rounded to 2 decimal places
+
+        card = MTGCard(cardName, cardRarity, cardPrice) # create a card object
+        cardList.append(card) # add the card obj to the cardList list
+    
+    return cardList
+
+# Get information from user and create userInfo object
 userInput = getInfo()
 
-# check which set was selected and set type
-    # Create obj for the pack to be opened
-        # Run logic to select first card
-            # create card object for the card drawn
-            # Store info in card object
-            # store card info in cardList (which is in the MTGPack obj)
-            # continue until last card
-        # Calculate gross profits for cards >= floorPrice
-        # Store pack in openedPackList
-        # Continue until last pack
+# create the object that will hold all pack objects
+openedMTGPacks = MTGOpenedPacks(userInput.floorPrice)
 
-testPack1 = MTGPack() # create the object to hold the pack
-# Logic to draw card from the pack
-testCard1 = MTGCard(cardName, cardRarity, cardPrice) # create card object to hold drawn card info
-# call method to add MTGCard obj to the MTGPack cardList
-testPack1.addCard(testCard1)
-# Continue until the last card
-# Calculate the pack's grossProfit, if any
+# simulate opening X amount of packs, defined by user
+for pack in range(userInput.numToOpen): # opening a pack
+
+    # Create a pack object
+    testPack = MTGPack()
+
+    # Generate the num of cards per pack, returns a list of MTGCard objects
+    cardList = genRandCard(14)
+
+    # add the current cardList to the MTGPack object cardList
+    testPack.cardList = cardList
+
+    # Calculate the total gross profit of the pack, if any. 
+    for cPrice in cardList:
+        if cPrice.cardPrice >= openedMTGPacks.floorPrice:
+            # packs gross profit
+            testPack.packGrossProfit += cPrice.cardPrice
+
+for c in testPack.cardList:
+    print(c.cardName, c.cardRarity, c.cardPrice)
+
+print("Gross profit: ", testPack.packGrossProfit)
